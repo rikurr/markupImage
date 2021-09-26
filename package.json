@@ -7,10 +7,12 @@
     "start": "tsc && node main.js"
   },
   "devDependencies": {
+    "@types/commander": "^2.12.2",
     "@types/glob": "^7.1.4",
     "@types/mkdirp": "^1.0.2",
     "@types/node": "^16.10.1",
     "@types/sharp": "^0.29.2",
+    "commander": "^8.2.0",
     "glob": "^7.2.0",
     "mkdirp": "^1.0.4",
     "sharp": "^0.29.1",
