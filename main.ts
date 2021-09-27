@@ -5,9 +5,13 @@ import glob from "glob";
 import mkdirp from "mkdirp";
 
 type Retina = "true" | "false";
+type Width = string | undefined;
+type Height = string | undefined;
 
 type Opt = {
   retina: Retina;
+  width: Width;
+  height: Height;
 };
 
 const IMAGE_DIR = glob.sync("src/*");
@@ -47,7 +51,12 @@ const createTag = (
 };
 
 // 画像の変換
-const convertImage = async (path: string, retina: Retina): Promise<string> => {
+const convertImage = async (
+  path: string,
+  retina: Retina,
+  width: Width,
+  height: Height
+): Promise<string> => {
   const filename = path.split("/")[1];
   const imgName = filename.split(".")[0];
   const extension = filename.split(".")[1];
@@ -70,10 +79,15 @@ const convertImage = async (path: string, retina: Retina): Promise<string> => {
       .webp({ quality: 75 })
       .toFile(`dist/images/${imgName}.webp`);
 
-    const width = retina === "true" ? Math.floor(info.width / 2) : info.width;
-    const height =
+    if (width && height) {
+      return createTag(imgName, filename, parseInt(width), parseInt(height));
+    }
+
+    const imgWidth =
+      retina === "true" ? Math.floor(info.width / 2) : info.width;
+    const imgHeight =
       retina === "true" ? Math.floor(info.height / 2) : info.height;
-    return createTag(imgName, filename, width, height);
+    return createTag(imgName, filename, imgWidth, imgHeight);
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
@@ -83,10 +97,10 @@ const convertImage = async (path: string, retina: Retina): Promise<string> => {
 };
 
 // ファイルの生成
-const writeFiles = async (retina: Retina) => {
+const writeFiles = async (retina: Retina, width: Width, height: Height) => {
   const imageTags = await Promise.all(
     IMAGE_DIR.map((path) => {
-      return convertImage(path, retina);
+      return convertImage(path, retina, width, height);
     })
   );
 
@@ -99,12 +113,16 @@ const main = async () => {
   program
     .version("0.0.1", "-v, --version")
     .option("-r, --retina <retina>", "レティーナ対応", "false")
+    .option("-w, --width <width>", "imgタグwidthの指定")
+    .option("-h --height <height>", "imgタグheightの指定")
     .parse(process.argv);
+
   const opt = program.opts<Opt>();
+
 
   await removeOutputDir();
   await createOutputDir();
-  await writeFiles(opt.retina);
+  await writeFiles(opt.retina, opt.width, opt.height);
 
   console.log("タスク完了");
 };
