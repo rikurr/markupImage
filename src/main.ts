@@ -3,6 +3,7 @@ import { Command } from "commander";
 import sharp from "sharp";
 import glob from "glob";
 import mkdirp from "mkdirp";
+import { createTag } from './lib/createTag';
 
 type Retina = "true" | "false";
 type Width = string | undefined;
@@ -14,7 +15,7 @@ type Opt = {
   height: Height;
 };
 
-const IMAGE_DIR = glob.sync("src/*");
+const IMAGE_DIR = glob.sync("target/*");
 const OUTPUT_DIR = "dist/images";
 
 // 出力ファイルの削除
@@ -35,20 +36,7 @@ const writeHtml = async (htmlTag: string) => {
   });
 };
 
-// pictureタグの作成
-const createTag = (
-  imgName: string,
-  filename: string,
-  width: number,
-  height: number
-) => {
-  return `
-    <picture>
-        <source type="image/webp" srcset="${imgName}.webp" />
-        <img src="${filename}" width="${width}" height="${height}" decoding="async" alt=""  />
-    </picture>
-    `;
-};
+
 
 // 画像の変換
 const convertImage = async (
