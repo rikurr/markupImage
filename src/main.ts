@@ -3,12 +3,11 @@ import { Command } from "commander";
 import sharp from "sharp";
 import glob from "glob";
 import mkdirp from "mkdirp";
-import { createTag } from './lib/createTag';
+import { createTag } from "./lib/createTag";
 
 type Retina = "true" | "false";
 type Width = string | undefined;
 type Height = string | undefined;
-
 type Opt = {
   retina: Retina;
   width: Width;
@@ -16,12 +15,7 @@ type Opt = {
 };
 
 const IMAGE_DIR = glob.sync("target/*");
-const OUTPUT_DIR = "dist/images";
-
-// 出力ファイルの削除
-const removeOutputDir = async () => {
-  fs.rmSync(`dist`, { recursive: true, force: true });
-};
+const OUTPUT_DIR = "dist/img";
 
 // 出力ファイルの作成
 const createOutputDir = async () => {
@@ -36,8 +30,6 @@ const writeHtml = async (htmlTag: string) => {
   });
 };
 
-
-
 // 画像の変換
 const convertImage = async (
   path: string,
@@ -51,13 +43,13 @@ const convertImage = async (
   const image = sharp(path);
 
   if (extension === "png") {
-    image.png({ quality: 75 }).toFile(`dist/images/${filename}`, (err) => {
+    image.png({ quality: 75 }).toFile(`${OUTPUT_DIR}${filename}`, (err) => {
       if (err) console.log(err);
     });
   }
 
   if (extension === "jpeg" || extension === "jpg") {
-    image.jpeg({ quality: 75 }).toFile(`dist/images/${filename}`, (err) => {
+    image.jpeg({ quality: 75 }).toFile(`${OUTPUT_DIR}${filename}`, (err) => {
       if (err) console.log(err);
     });
   }
@@ -65,7 +57,7 @@ const convertImage = async (
   try {
     const info = await image
       .webp({ quality: 75 })
-      .toFile(`dist/images/${imgName}.webp`);
+      .toFile(`${OUTPUT_DIR}${imgName}.webp`);
 
     if (width && height) {
       return createTag(imgName, filename, parseInt(width), parseInt(height));
@@ -104,11 +96,8 @@ const main = async () => {
     .option("-w, --width <width>", "imgタグwidthの指定")
     .option("-h --height <height>", "imgタグheightの指定")
     .parse(process.argv);
-
   const opt = program.opts<Opt>();
 
-
-  await removeOutputDir();
   await createOutputDir();
   await writeFiles(opt.retina, opt.width, opt.height);
 
