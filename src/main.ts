@@ -44,13 +44,13 @@ const convertImage = async (
   const image = sharp(path);
 
   if (extension === "png") {
-    image.png({ quality: 75 }).toFile(`${OUTPUT_DIR}${filename}`, (err) => {
+    image.png({ quality: 75 }).toFile(`${OUTPUT_DIR}/${filename}`, (err) => {
       if (err) console.log(err);
     });
   }
 
   if (extension === "jpeg" || extension === "jpg") {
-    image.jpeg({ quality: 75 }).toFile(`${OUTPUT_DIR}${filename}`, (err) => {
+    image.jpeg({ quality: 75 }).toFile(`${OUTPUT_DIR}/${filename}`, (err) => {
       if (err) console.log(err);
     });
   }
@@ -58,7 +58,7 @@ const convertImage = async (
   try {
     const info = await image
       .webp({ quality: 75 })
-      .toFile(`${OUTPUT_DIR}${imgName}.webp`);
+      .toFile(`${OUTPUT_DIR}/${imgName}.webp`);
 
     if (width && height) {
       return createTag(imgName, filename, parseInt(width), parseInt(height));
