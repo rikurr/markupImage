@@ -18,10 +18,6 @@ type Opt = {
 const IMAGE_DIR = glob.sync("target/*");
 const OUTPUT_DIR = "dist/images";
 
-// 出力ファイルの削除
-const removeOutputDir = async () => {
-  fs.rmSync(`dist`, { recursive: true, force: true });
-};
 
 // 出力ファイルの作成
 const createOutputDir = async () => {
@@ -108,7 +104,6 @@ const main = async () => {
   const opt = program.opts<Opt>();
 
 
-  await removeOutputDir();
   await createOutputDir();
   await writeFiles(opt.retina, opt.width, opt.height);
 
