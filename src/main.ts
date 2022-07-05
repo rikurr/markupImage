@@ -17,7 +17,6 @@ type Opt = {
 const IMAGE_DIR = glob.sync("target/*");
 const OUTPUT_DIR = "dist/images";
 
-
 // 出力ファイルの作成
 const createOutputDir = async () => {
   mkdirp.sync(OUTPUT_DIR);
@@ -36,7 +35,7 @@ const convertImage = async (
   path: string,
   retina: Retina,
   width: Width,
-  height: Height
+  height: Height,
 ): Promise<string> => {
   const filename = path.split("/")[1];
   const imgName = filename.split(".")[0];
@@ -47,6 +46,14 @@ const convertImage = async (
     image.png({ quality: 80 }).toFile(`${OUTPUT_DIR}/${filename}`, (err) => {
       if (err) console.log(err);
     });
+  }
+
+  if (extension === "tif") {
+    image
+      .jpeg({ quality: 80 })
+      .toFile(`${OUTPUT_DIR}/${imgName}.jpg`, (err) => {
+        if (err) console.log(err);
+      });
   }
 
   if (extension === "jpeg" || extension === "jpg") {
@@ -82,7 +89,7 @@ const writeFiles = async (retina: Retina, width: Width, height: Height) => {
   const imageTags = await Promise.all(
     IMAGE_DIR.map((path) => {
       return convertImage(path, retina, width, height);
-    })
+    }),
   );
 
   writeHtml(imageTags.join(""));
